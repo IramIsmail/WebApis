@@ -20,6 +20,11 @@ namespace WebApis
             // Web API routes
             config.MapHttpAttributeRoutes();
 
+             config.Routes.MapHttpRoute(
+                name: "ActionMethods",
+                routeTemplate: "api/{controller}/{action}/{id}",
+                defaults: new { user = RouteParameter.Optional }
+                );
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
