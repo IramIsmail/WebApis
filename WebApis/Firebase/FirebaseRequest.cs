@@ -56,7 +56,6 @@ namespace WebApis.Firebase
             var response = UtilityHelper.RequestHelper(this.Method, requestURI, json);
             response.Wait();
             var result = response.Result;
-
             var firebaseResponse = new FirebaseResponse()
             {
                 HttpResponse = result,
