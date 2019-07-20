@@ -28,13 +28,7 @@ namespace WebApis.Controllers
 
     public class UserController : ApiController
     {
-       /*  [HttpGet]   
-       
-        public IHttpActionResult Get() {
-           
-            return Ok("done");
-           
-        }*/
+      
 
         [HttpGet]     
         [Route("api/user/list/")]
@@ -47,18 +41,14 @@ namespace WebApis.Controllers
             
 
             FirebaseResponse getResponse = firebaseDBTeams.Get();
-            System.Diagnostics.Debug.WriteLine(getResponse.JSONContent+ "jjjjjjj");
+           
             Customer c = JsonConvert.DeserializeObject<Customer>(getResponse.JSONContent);
            
-          //  List<Customer> list = JsonConvert.DeserializeObject<List<Customer>>(getResponse.JSONContent);
             List<Customer> newlist = new List<Customer>();
-            System.Diagnostics.Debug.WriteLine(JObject.Parse(getResponse.JSONContent) + "jjjj000jjj");
            
             var obj = JsonConvert.DeserializeObject<RootObject>(getResponse.JSONContent);
             var mList = JsonConvert.DeserializeObject<IDictionary<string, Customer>>(getResponse.JSONContent);
-           // System.Diagnostics.Debug.WriteLine(obj.logInResult.Count() + "======current=========");
-            System.Diagnostics.Debug.WriteLine(mList.Count + "=mmmm=====current=========");
-
+           
 
             foreach (var v in mList)
             {
@@ -66,14 +56,9 @@ namespace WebApis.Controllers
                 {
                     newlist.Add(v.Value);
                 }
-                System.Diagnostics.Debug.WriteLine(v.Value.Id + "===============");
             }
-            System.Diagnostics.Debug.WriteLine(newlist.Count()+ "======new=========");
-            // return Ok(JObject.Parse(getResponse.JSONContent));
             return Ok(newlist);
-            //   if (getResponse.Success)
-            //      System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
-            //  System.Diagnostics.Debug.WriteLine(getResponse.ToString());
+           
 
         }
 
@@ -131,28 +116,15 @@ namespace WebApis.Controllers
 
                 System.Diagnostics.Debug.WriteLine("PUT Request");
                 FirebaseResponse putResponse = firebaseDBTeams.Put(JsonConvert.SerializeObject(c));
-                System.Diagnostics.Debug.WriteLine(putResponse.Success);
                 return Ok("Resgistered Successfully") ;
                 
             }
 
             else {
-                System.Diagnostics.Debug.WriteLine("Already present");
                 return BadRequest("User Already Registered with this Email Id");
             }
         }
-
-
-
-
-
-
-
-
-        /*   List<Customer> customers = new List<Customer> {
-              new Customer(1,"Iram","iram@gmail.com"),
-              new Customer(2,"Ismail","ismail.@gmail.com")
-          };*/
+        
 
 
         [HttpPost]
@@ -162,31 +134,17 @@ namespace WebApis.Controllers
             {
               
                 string key = imageModel.title.Replace(".", ",");
-                System.Diagnostics.Debug.WriteLine(imageModel.title + "jjjjjjjj");
-            System.Diagnostics.Debug.WriteLine(imageModel.image + "lllllllllllll");
-                System.Diagnostics.Debug.WriteLine("==========================================");
-                System.Diagnostics.Debug.WriteLine(imageModel.document + "lllllll000llllll");
 
                 FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
                 FirebaseDB firebaseDBTeams = firebaseDB.Node("Pictures").NodePath(key);
 
                 FirebaseResponse getResponse = firebaseDBTeams.Get();
-
-
-               
-                    System.Diagnostics.Debug.WriteLine("PUT Request");
-                    FirebaseResponse putResponse = firebaseDBTeams.Put(JsonConvert.SerializeObject(imageModel));
-                    System.Diagnostics.Debug.WriteLine(putResponse.Success);
+                FirebaseResponse putResponse = firebaseDBTeams.Put(JsonConvert.SerializeObject(imageModel));
                 return Ok(imageModel);
-                
-
-               
-
-
-
+   
             }
             catch (Exception f) {
-                return BadRequest("Errorrr");
+                return BadRequest("Error");
             }
 
         }
@@ -208,10 +166,7 @@ namespace WebApis.Controllers
         {
             
             string uu = c.Id.Replace(".", ",");
-            System.Diagnostics.Debug.WriteLine(uu+ "jjjjjjj----");
-
-            System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(c) + "jjjjjjj");
-            
+          
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
             FirebaseDB firebaseDBTeams = firebaseDB.Node("Users").NodePath(uu);
 
@@ -221,16 +176,13 @@ namespace WebApis.Controllers
             if (Convert.ToString(getResponse.JSONContent) != "null")
             {
 
-                System.Diagnostics.Debug.WriteLine("PATCH Request");
                 FirebaseResponse putResponse = firebaseDBTeams.Patch(JsonConvert.SerializeObject(c));
-                System.Diagnostics.Debug.WriteLine(putResponse.Success);
                 return Ok("Updated Successfully");
 
             }
 
             else
             {
-                System.Diagnostics.Debug.WriteLine("Already present");
                 return BadRequest("User is not Registered with this Email Id");
             }
         }
@@ -244,7 +196,6 @@ namespace WebApis.Controllers
         [Route("api/user/getimage")]
         public IHttpActionResult getImageModel(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id+"jjj9999999999999999999jj");
            
            string uu = id.Replace(".", ",");
 
@@ -255,7 +206,6 @@ namespace WebApis.Controllers
 
             if (Convert.ToString(getResponse.JSONContent) == "null")
             {
-                System.Diagnostics.Debug.WriteLine("Doesn't exists");
 
                 return null;
             }
@@ -264,7 +214,6 @@ namespace WebApis.Controllers
                 ImageModel c2 = JsonConvert.DeserializeObject<ImageModel>(getResponse.JSONContent);
                 if (c2!=null)
                 {
-                    System.Diagnostics.Debug.WriteLine(getResponse.JSONContent + "Getting ImageModel");
 
                     return Ok(c2);
                 }
@@ -280,7 +229,6 @@ namespace WebApis.Controllers
         [Route("api/user/getuser")]
         public IHttpActionResult getClient(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id + "jjj0000jjjj");
 
             string uu = id.Replace(".", ",");
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
@@ -289,20 +237,15 @@ namespace WebApis.Controllers
             FirebaseResponse getResponse = firebaseDBTeams.Get();
 
 
-
-
-
             if (Convert.ToString(getResponse.JSONContent) == "null")
             {
 
-                System.Diagnostics.Debug.WriteLine("Doesnt'Exists");
                 return null;
 
             }
 
             else
             {
-                System.Diagnostics.Debug.WriteLine("Yes Exists");
                 Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse.JSONContent);
                 return Ok(c2);
             }
@@ -317,22 +260,11 @@ namespace WebApis.Controllers
         {
 
             RequestDTO requestDTO = new RequestDTO();
-
-
-
-           
-
-          
-            System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(request) + "############");
-
+            
             string loginId = request.senderId.Replace(".", ",");
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
             FirebaseDB firebaseDBTeams = firebaseDB.Node("Requests").NodePath(loginId).Node(request.destinationId.Replace(".", ","));
             FirebaseDB firebaseDBTeams2 = firebaseDB.Node("Proposals").NodePath(request.destinationId.Replace(".", ",")).Node(loginId);
-
-
-
-
 
 
             requestDTO.status =request.destinationId.Replace(".", ",");
@@ -343,14 +275,11 @@ namespace WebApis.Controllers
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(foo);
             FirebaseResponse getResponse = firebaseDBTeams.Get();
 
-            System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
             if (Convert.ToString(getResponse.JSONContent) == "null")
             {
-                System.Diagnostics.Debug.WriteLine("PUT Request");
                 FirebaseResponse putResponse = firebaseDBTeams.Post(JsonConvert.SerializeObject(json));
 
                 FirebaseResponse putResponse2 = firebaseDBTeams2.Post(JsonConvert.SerializeObject(json)); 
-                System.Diagnostics.Debug.WriteLine(putResponse);
                 return Ok("Resgistered Successfully");
 
             }
@@ -370,13 +299,7 @@ namespace WebApis.Controllers
 
             RequestDTO requestDTO = new RequestDTO();
 
-
-
-
-
-
-            System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(request) + "############");
-
+            
             string loginId = request.senderId.Replace(".", ",");
 
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
@@ -395,7 +318,6 @@ namespace WebApis.Controllers
             FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
             FirebaseResponse getResponse3 = firebaseDBTeams3.Get();
 
-            System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
 
            
                 FirebaseResponse deleteResponse = firebaseDBTeams3.Delete();
@@ -403,11 +325,9 @@ namespace WebApis.Controllers
             
             if (Convert.ToString(getResponse.JSONContent) == "null")
             {
-                System.Diagnostics.Debug.WriteLine("PUT Request");
                 FirebaseResponse putResponse = firebaseDBTeams.Post(JsonConvert.SerializeObject(json));
                 firebaseDBTeams2.Post(JsonConvert.SerializeObject(json));
               
-                System.Diagnostics.Debug.WriteLine(putResponse);
                 return Ok("Respond Successfully");
 
             }
@@ -418,47 +338,7 @@ namespace WebApis.Controllers
                 return BadRequest("User Already Registered with this Email Id");
             }
         }
-        /* [HttpPost]
-         [Route("api/user/add")]
-         public IHttpActionResult add(string id,string loginId)
-         {
-             System.Diagnostics.Debug.WriteLine(id+ "jjjj88jjj"+ loginId);
-
-             Clients c=new Clients(id);
-
-            loginId= loginId.Replace(".", ",");
-             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
-             FirebaseDB firebaseDBTeams = firebaseDB.Node("Clients").NodePath(loginId).Node(id);
-             string iiid = id;
-
-
-           dynamic foo = new JObject();
-             foo.id= id;
-
-             string json = Newtonsoft.Json.JsonConvert.SerializeObject(foo);
-
-
-
-             FirebaseResponse getResponse = firebaseDBTeams.Get();
-
-             System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
-             if (Convert.ToString(getResponse.JSONContent) == "null")
-             {               
-                 System.Diagnostics.Debug.WriteLine("PUT Request");
-                 FirebaseResponse putResponse = firebaseDBTeams.Post(JsonConvert.SerializeObject(c));
-                 System.Diagnostics.Debug.WriteLine(putResponse);
-                 return Ok("Resgistered Successfully");
-
-             }          
-
-             else
-             {
-                 System.Diagnostics.Debug.WriteLine("Already present");
-                 return BadRequest("User Already Registered with this Email Id");
-             }
-         }
-
-     */
+        
         [HttpPost]
         [Route("api/user/search")]
         public IHttpActionResult searchuser([FromBody]SearchCriteria c)
@@ -466,13 +346,10 @@ namespace WebApis.Controllers
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
             FirebaseDB firebaseDBTeams = firebaseDB.Node("Users");
             FirebaseResponse getResponse = firebaseDBTeams.Get();
-            System.Diagnostics.Debug.WriteLine(c.address+ "jjjjjjj"+c.occupation+"88888"+c.gender+"------"+c.age);
             List<Customer> newlist = new List<Customer>();
-            System.Diagnostics.Debug.WriteLine(JObject.Parse(getResponse.JSONContent) + "jjjj000jjj");
 
             var obj = JsonConvert.DeserializeObject<RootObject>(getResponse.JSONContent);
             var mList = JsonConvert.DeserializeObject<IDictionary<string, Customer>>(getResponse.JSONContent);
-            System.Diagnostics.Debug.WriteLine(mList.Count + "=mmmm=====current=========");
             int min, max;
             
             if (c.age == "0") {
@@ -501,7 +378,6 @@ namespace WebApis.Controllers
                 int birthDay = int.Parse(splitString[0].Trim());
                 int birthMonth = int.Parse(splitString[1].Trim());
                 int birthYear  = int.Parse(splitString[2].Trim());
-                 System.Diagnostics.Debug.WriteLine(birthDay + "===============" +birthMonth+ "==============="+birthYear);
                 double year;
                 DateTime birthDate = new DateTime(birthYear, birthMonth, birthDay);
                 DateTime currentDate = new DateTime();
@@ -509,11 +385,9 @@ namespace WebApis.Controllers
                 TimeSpan age = new TimeSpan();
                 age = currentDate - birthDate;
                 year = age.Days / 365;
-                System.Diagnostics.Debug.WriteLine(year + "======age waeeans========="+min +"0000"+max);
                 if (v.Value.address==c.address && v.Value.profession==c.occupation && v.Value.gender==c.gender && (year>=min && year<=max))
                 {
                     newlist.Add(v.Value);
-                    System.Diagnostics.Debug.WriteLine(v.Value.email_Id + "===============");
                 }
                 
             }
@@ -524,7 +398,6 @@ namespace WebApis.Controllers
         [Route("api/user/requests/")]
         public IHttpActionResult requestlist(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id+ "yeyeyeyeyeye");
             string url = id;
             string uu = url.Replace(".", ",");
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
@@ -535,7 +408,6 @@ namespace WebApis.Controllers
             if (Convert.ToString(getResponse.JSONContent) != "null")
             {
                 var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
-                System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
                 List<Customer> newlist = new List<Customer>();
 
                 foreach (var v in mList)
@@ -545,8 +417,6 @@ namespace WebApis.Controllers
                     FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
                     Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
                     newlist.Add(c2);
-                    System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
-                    System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
                 }
 
                 return Ok(newlist);
@@ -561,7 +431,6 @@ namespace WebApis.Controllers
         [Route("api/user/proposals/")]
         public IHttpActionResult proposallist(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id + "yeyeyeyeyeye");
             string url = id;
             string uu = url.Replace(".", ",");
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
@@ -574,7 +443,6 @@ namespace WebApis.Controllers
             {
 
                 var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
-               System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
                   List<Customer> newlist = new List<Customer>();
 
               foreach (var v in mList)
@@ -584,8 +452,6 @@ namespace WebApis.Controllers
                 FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
                 Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
                 newlist.Add(c2);
-                System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
-                System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
                  }
 
                 return Ok(newlist);
@@ -600,7 +466,6 @@ namespace WebApis.Controllers
         [Route("api/user/respondedtolist/")]
         public IHttpActionResult respondedtolist(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id + "yeyeyeyeyeye");
             string url = id;
             string uu = url.Replace(".", ",");
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
@@ -613,7 +478,6 @@ namespace WebApis.Controllers
             {
 
                 var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
-                System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
                 List<Customer> newlist = new List<Customer>();
 
                 foreach (var v in mList)
@@ -623,8 +487,7 @@ namespace WebApis.Controllers
                     FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
                     Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
                     newlist.Add(c2);
-                    System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
-                    System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
+                  
                 }
 
                 return Ok(newlist);
@@ -641,7 +504,6 @@ namespace WebApis.Controllers
         [Route("api/user/respondedbylist/")]
         public IHttpActionResult respondedBylist(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id + "yeyeyeyeyeye");
             string url = id;
             string uu = url.Replace(".", ",");
             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
@@ -654,7 +516,6 @@ namespace WebApis.Controllers
             {
 
                 var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
-                System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
                 List<Customer> newlist = new List<Customer>();
 
                 foreach (var v in mList)
@@ -664,8 +525,7 @@ namespace WebApis.Controllers
                     FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
                     Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
                     newlist.Add(c2);
-                    System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
-                    System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
+                    
                 }
 
                 return Ok(newlist);
