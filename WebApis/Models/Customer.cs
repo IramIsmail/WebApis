@@ -60,6 +60,8 @@ namespace WebApis.Models
         public string looking_for { set; get; }     
         public string mother_name { set; get; }
         public string mother_belongs { set; get; }
+        public string marital_status { set; get; }
+        public string about_me { set; get; }
 
 
 
@@ -68,6 +70,7 @@ namespace WebApis.Models
 
     public class RootObject
     {
+        
         public List<Customer> logInResult { get; set; }
     }
 }

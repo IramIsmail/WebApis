@@ -12,7 +12,7 @@ using Firebase.Database;
 using Firebase.Utils;
 using Firebase.Auth;
 using Firebase;
-
+ 
 using LiteDB;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -21,6 +21,7 @@ using System.Drawing;
 using System.Text;
 using System.IO;
 using Firebase.Storage;
+using System.Dynamic;
 
 namespace WebApis.Controllers
 {
@@ -243,7 +244,7 @@ namespace WebApis.Controllers
         [Route("api/user/getimage")]
         public IHttpActionResult getImageModel(String id)
         {
-            System.Diagnostics.Debug.WriteLine(id+"jjjjj");
+            System.Diagnostics.Debug.WriteLine(id+"jjj9999999999999999999jj");
            
            string uu = id.Replace(".", ",");
 
@@ -273,7 +274,408 @@ namespace WebApis.Controllers
                 }
             }
         }
+
+
+        [HttpGet]
+        [Route("api/user/getuser")]
+        public IHttpActionResult getClient(String id)
+        {
+            System.Diagnostics.Debug.WriteLine(id + "jjj0000jjjj");
+
+            string uu = id.Replace(".", ",");
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("Users").NodePath(uu);
+
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+
+
+
+
+
+            if (Convert.ToString(getResponse.JSONContent) == "null")
+            {
+
+                System.Diagnostics.Debug.WriteLine("Doesnt'Exists");
+                return null;
+
+            }
+
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Yes Exists");
+                Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse.JSONContent);
+                return Ok(c2);
+            }
+        }
+
+
+
+
+        [HttpPost]
+        [Route("api/user/add")]
+        public IHttpActionResult add([FromBody]Request request)
+        {
+
+            RequestDTO requestDTO = new RequestDTO();
+
+
+
+           
+
+          
+            System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(request) + "############");
+
+            string loginId = request.senderId.Replace(".", ",");
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("Requests").NodePath(loginId).Node(request.destinationId.Replace(".", ","));
+            FirebaseDB firebaseDBTeams2 = firebaseDB.Node("Proposals").NodePath(request.destinationId.Replace(".", ",")).Node(loginId);
+
+
+
+
+
+
+            requestDTO.status =request.destinationId.Replace(".", ",");
+
+            dynamic foo = new ExpandoObject();
+            foo.status = request.status;
+          
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(foo);
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+
+            System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
+            if (Convert.ToString(getResponse.JSONContent) == "null")
+            {
+                System.Diagnostics.Debug.WriteLine("PUT Request");
+                FirebaseResponse putResponse = firebaseDBTeams.Post(JsonConvert.SerializeObject(json));
+
+                FirebaseResponse putResponse2 = firebaseDBTeams2.Post(JsonConvert.SerializeObject(json)); 
+                System.Diagnostics.Debug.WriteLine(putResponse);
+                return Ok("Resgistered Successfully");
+
+            }
+
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Already present");
+                return BadRequest("User Already Registered with this Email Id");
+            }
+        }
+
+
+        [HttpPost]
+        [Route("api/user/addresponds")]
+        public IHttpActionResult addResponds([FromBody]Request request)
+        {
+
+            RequestDTO requestDTO = new RequestDTO();
+
+
+
+
+
+
+            System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(request) + "############");
+
+            string loginId = request.senderId.Replace(".", ",");
+
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("RespondsBy").NodePath(loginId).Node(request.destinationId.Replace(".", ","));
+            FirebaseDB firebaseDBTeams2 = firebaseDB.Node("RespondsTo").NodePath(request.destinationId.Replace(".", ",")).Node(loginId);
+            FirebaseDB firebaseDBTeams3 = firebaseDB.Node("Requests").NodePath(loginId).Node(request.destinationId.Replace(".", ","));
+            FirebaseDB firebaseDBTeams4 = firebaseDB.Node("Proposals").NodePath(loginId).Node(request.destinationId.Replace(".", ","));
+
+            requestDTO.status = request.destinationId.Replace(".", ",");
+
+            dynamic foo = new ExpandoObject();
+            foo.status = request.status;
+
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(foo);
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+            FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
+            FirebaseResponse getResponse3 = firebaseDBTeams3.Get();
+
+            System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
+
+           
+                FirebaseResponse deleteResponse = firebaseDBTeams3.Delete();
+                FirebaseResponse deleteResponse2 = firebaseDBTeams4.Delete();
+            
+            if (Convert.ToString(getResponse.JSONContent) == "null")
+            {
+                System.Diagnostics.Debug.WriteLine("PUT Request");
+                FirebaseResponse putResponse = firebaseDBTeams.Post(JsonConvert.SerializeObject(json));
+                firebaseDBTeams2.Post(JsonConvert.SerializeObject(json));
+              
+                System.Diagnostics.Debug.WriteLine(putResponse);
+                return Ok("Respond Successfully");
+
+            }
+
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Already present");
+                return BadRequest("User Already Registered with this Email Id");
+            }
+        }
+        /* [HttpPost]
+         [Route("api/user/add")]
+         public IHttpActionResult add(string id,string loginId)
+         {
+             System.Diagnostics.Debug.WriteLine(id+ "jjjj88jjj"+ loginId);
+
+             Clients c=new Clients(id);
+
+            loginId= loginId.Replace(".", ",");
+             FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+             FirebaseDB firebaseDBTeams = firebaseDB.Node("Clients").NodePath(loginId).Node(id);
+             string iiid = id;
+
+
+           dynamic foo = new JObject();
+             foo.id= id;
+
+             string json = Newtonsoft.Json.JsonConvert.SerializeObject(foo);
+
+
+
+             FirebaseResponse getResponse = firebaseDBTeams.Get();
+
+             System.Diagnostics.Debug.WriteLine(getResponse.JSONContent);
+             if (Convert.ToString(getResponse.JSONContent) == "null")
+             {               
+                 System.Diagnostics.Debug.WriteLine("PUT Request");
+                 FirebaseResponse putResponse = firebaseDBTeams.Post(JsonConvert.SerializeObject(c));
+                 System.Diagnostics.Debug.WriteLine(putResponse);
+                 return Ok("Resgistered Successfully");
+
+             }          
+
+             else
+             {
+                 System.Diagnostics.Debug.WriteLine("Already present");
+                 return BadRequest("User Already Registered with this Email Id");
+             }
+         }
+
+     */
+        [HttpPost]
+        [Route("api/user/search")]
+        public IHttpActionResult searchuser([FromBody]SearchCriteria c)
+        {
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("Users");
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+            System.Diagnostics.Debug.WriteLine(c.address+ "jjjjjjj"+c.occupation+"88888"+c.gender+"------"+c.age);
+            List<Customer> newlist = new List<Customer>();
+            System.Diagnostics.Debug.WriteLine(JObject.Parse(getResponse.JSONContent) + "jjjj000jjj");
+
+            var obj = JsonConvert.DeserializeObject<RootObject>(getResponse.JSONContent);
+            var mList = JsonConvert.DeserializeObject<IDictionary<string, Customer>>(getResponse.JSONContent);
+            System.Diagnostics.Debug.WriteLine(mList.Count + "=mmmm=====current=========");
+            int min, max;
+            
+            if (c.age == "0") {
+                min = 20;
+                max = 25;
+            }
+            else if(c.age=="1"){
+                min = 25;
+                max = 30;
+            }
+            else if(c.age=="2"){
+                min = 30;
+                max = 35;
+            }
+            else
+            {
+                min = 35;
+                max =45;
+            }
+
+
+            foreach (var v in mList)            
+            {
+                string[] splitString = v.Value.dob.Split('/');
+
+                int birthDay = int.Parse(splitString[0].Trim());
+                int birthMonth = int.Parse(splitString[1].Trim());
+                int birthYear  = int.Parse(splitString[2].Trim());
+                 System.Diagnostics.Debug.WriteLine(birthDay + "===============" +birthMonth+ "==============="+birthYear);
+                double year;
+                DateTime birthDate = new DateTime(birthYear, birthMonth, birthDay);
+                DateTime currentDate = new DateTime();
+                currentDate = DateTime.Now;
+                TimeSpan age = new TimeSpan();
+                age = currentDate - birthDate;
+                year = age.Days / 365;
+                System.Diagnostics.Debug.WriteLine(year + "======age waeeans========="+min +"0000"+max);
+                if (v.Value.address==c.address && v.Value.profession==c.occupation && v.Value.gender==c.gender && (year>=min && year<=max))
+                {
+                    newlist.Add(v.Value);
+                    System.Diagnostics.Debug.WriteLine(v.Value.email_Id + "===============");
+                }
+                
+            }
+
+            return Ok(newlist);
+        }
+        [HttpGet]
+        [Route("api/user/requests/")]
+        public IHttpActionResult requestlist(String id)
+        {
+            System.Diagnostics.Debug.WriteLine(id+ "yeyeyeyeyeye");
+            string url = id;
+            string uu = url.Replace(".", ",");
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("Requests").NodePath(uu);
+
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+           
+            if (Convert.ToString(getResponse.JSONContent) != "null")
+            {
+                var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
+                System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
+                List<Customer> newlist = new List<Customer>();
+
+                foreach (var v in mList)
+                {
+                    FirebaseDB firebaseDBTeams2 = firebaseDB.Node("Users").NodePath(v.Key);
+
+                    FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
+                    Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
+                    newlist.Add(c2);
+                    System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
+                    System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
+                }
+
+                return Ok(newlist);
+            }
+            else {
+                return null;
+            }
+        }
+
+        
+        [HttpGet]
+        [Route("api/user/proposals/")]
+        public IHttpActionResult proposallist(String id)
+        {
+            System.Diagnostics.Debug.WriteLine(id + "yeyeyeyeyeye");
+            string url = id;
+            string uu = url.Replace(".", ",");
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("Proposals").NodePath(uu);
+
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+
+
+            if (Convert.ToString(getResponse.JSONContent) != "null")
+            {
+
+                var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
+               System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
+                  List<Customer> newlist = new List<Customer>();
+
+              foreach (var v in mList)
+                  {
+                FirebaseDB firebaseDBTeams2 = firebaseDB.Node("Users").NodePath(v.Key);
+
+                FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
+                Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
+                newlist.Add(c2);
+                System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
+                System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
+                 }
+
+                return Ok(newlist);
+            }
+        else{
+                return null;
+        }
+        }
+
+
+        [HttpGet]
+        [Route("api/user/respondedtolist/")]
+        public IHttpActionResult respondedtolist(String id)
+        {
+            System.Diagnostics.Debug.WriteLine(id + "yeyeyeyeyeye");
+            string url = id;
+            string uu = url.Replace(".", ",");
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("RespondsBy").NodePath(uu);
+
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+
+
+            if (Convert.ToString(getResponse.JSONContent) != "null")
+            {
+
+                var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
+                System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
+                List<Customer> newlist = new List<Customer>();
+
+                foreach (var v in mList)
+                {
+                    FirebaseDB firebaseDBTeams2 = firebaseDB.Node("Users").NodePath(v.Key);
+
+                    FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
+                    Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
+                    newlist.Add(c2);
+                    System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
+                    System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
+                }
+
+                return Ok(newlist);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("api/user/respondedbylist/")]
+        public IHttpActionResult respondedBylist(String id)
+        {
+            System.Diagnostics.Debug.WriteLine(id + "yeyeyeyeyeye");
+            string url = id;
+            string uu = url.Replace(".", ",");
+            FirebaseDB firebaseDB = new FirebaseDB("https://myshop-b8424.firebaseio.com/");
+            FirebaseDB firebaseDBTeams = firebaseDB.Node("RespondsTo").NodePath(uu);
+
+            FirebaseResponse getResponse = firebaseDBTeams.Get();
+
+
+            if (Convert.ToString(getResponse.JSONContent) != "null")
+            {
+
+                var mList = JsonConvert.DeserializeObject<IDictionary<string, Request>>(getResponse.JSONContent);
+                System.Diagnostics.Debug.WriteLine(mList + "tuuuuuuuuu8888uuuuuuuuuuuuu");
+                List<Customer> newlist = new List<Customer>();
+
+                foreach (var v in mList)
+                {
+                    FirebaseDB firebaseDBTeams2 = firebaseDB.Node("Users").NodePath(v.Key);
+
+                    FirebaseResponse getResponse2 = firebaseDBTeams2.Get();
+                    Customer c2 = JsonConvert.DeserializeObject<Customer>(getResponse2.JSONContent);
+                    newlist.Add(c2);
+                    System.Diagnostics.Debug.WriteLine(v.Key + "=========o======");
+                    System.Diagnostics.Debug.WriteLine(c2.Id + "=====jj==========");
+                }
+
+                return Ok(newlist);
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 
-   
+
 }
